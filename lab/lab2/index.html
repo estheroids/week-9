@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="css/leaflet.css" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    <link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css" rel="stylesheet">
+
   </head>
   <body>
     <!-- Map -->
@@ -23,12 +26,14 @@
       <h2 class="h3">From <span style="color:blue">here</span> to <span style="color:red">there</span></h2>
       <label for="dest">Enter a destination</label>
       <input id="dest" type="text">
-      <button id="calculate" disabled>Calculate Route</button>
+      <button id="calculate">Calculate Route</button>
     </div>
     <!-- Javascript Imports -->
-    <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
     <script src="js/decode.js"></script>
     <script src="js/setup.js"></script>
     <script src="js/main.js"></script>

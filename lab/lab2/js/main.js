@@ -114,6 +114,28 @@ take to get from your origin to your destination.
 Task 6: (stretch) See if you can refocus the map to roughly the bounding box of your route
 
 
+/*
+https://mapzen.com/documentation/mapzen-js/search/
+var geocoder = L.Mapzen.geocoder();
+geocoder.addTo(map);
+
+L.Mapzen.apiKey = 'your-mapzen-api-key';
+
+var geocoder = L.Mapzen.geocoder();
+geocoder.addTo(map);
+
+var geocoder = L.Mapzen.geocoder('your-other-mapzen-api-key');
+geocoder.addTo(map);
+
+var geocoderOptions = {
+  autocomplete: false
+};
+
+var geocoder = L.Mapzen.geocoder('mapzen-api-key', geocoderOptions);
+geocoder.addTo(map);
+
+mapzen-JA21Wes
+
 ===================== */
 
 var state = {
@@ -142,11 +164,16 @@ var updatePosition = function(lat, lng, updated) {
   goToOrigin(lat, lng);
 };
 
+
+var current = [];
+
 $(document).ready(function() {
   /* This 'if' check allows us to safely ask for the user's current position */
   if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(function(position) {
       updatePosition(position.coords.latitude, position.coords.longitude, position.timestamp);
+      current.push(position.coords.latitude, position.coords.longitude); // push current position/ origin coords into array
+      console.log(current);
     });
   } else {
     alert("Unable to access geolocation API!");
@@ -155,7 +182,6 @@ $(document).ready(function() {
 
   /* Every time a key is lifted while typing in the #dest input, disable
    * the #calculate button if no text is in the input
-   */
   $('#dest').keyup(function(e) {
     if ($('#dest').val().length === 0) {
       $('#calculate').attr('disabled', true);
@@ -163,13 +189,79 @@ $(document).ready(function() {
       $('#calculate').attr('disabled', false);
     }
   });
+*/
+var searchText;
+var mzQuery;
+var destination=[];
+var origLoc={};
+var destLoc={};
+var loc;
+var jsonLoc;
+var routing;
+var dC;
+var rCoords;
 
   // click handler for the "calculate" button (probably you want to do something with this)
   $("#calculate").click(function(e) {
-    var dest = $('#dest').val();
-    console.log(dest);
-  });
+    var searchText = $('#dest').val(); //user input
+    console.log(searchText);
+    mzQuery = "https://search.mapzen.com/v1/autocomplete?api_key=mapzen-zahwvV2&focus.point.lat=39.9526&focus.point.lon=-75.1652&text="+searchText+"";
+    $.ajax(mzQuery).done(function(dest){
+      console.log(dest.features[0].geometry.coordinates);
+      destination.push(dest.features[0].geometry.coordinates[1],dest.features[0].geometry.coordinates[0]);
+      console.log(destination);
+      L.circleMarker(destination, {color: "red"}).addTo(map);
 
+      origLoc = {"lat":current[0], "lon":current[1]};
+      destLoc = {"lat":destination[0], "lon":destination[1]};
+
+      console.log(origLoc);
+      console.log(destLoc);
+
+      loc = [origLoc,destLoc];
+      jsonLoc = JSON.stringify(loc);
+      console.log(jsonLoc);
+
+//mapzen-zahwvV2
+      routingOP = $.ajax('https://matrix.mapzen.com/optimized_route?json={"locations":' + jsonLoc + ',"costing":"auto","directions_options":{"units":"miles"}}&api_key=mapzen-zahwvV2');
+      routingOP.done(function(route){
+      console.log(route.trip.legs[0].shape);
+      dC = decode(route.trip.legs[0].shape);
+      console.log(dC);
+
+      var routeLine = _.map(dC, function(co) {
+        return ([co[0], co[1]]);
+     });
+
+      console.log(rCoords);
+      var mapRoute = L.polyline(routeLine, {color: 'purple'}).addTo(map);
+      });
+
+    });
+  });
 });
 
 
+
+
+
+         $.ajax({
+           url: "https://search.mapzen.com/v1/search",
+           method: "GET",
+           dataType: "json",
+           data: {
+             "api_key": "mapzen-zahwvV2",
+             "text":"Philadelphia, US",
+              },
+              success: function( data, status, jqxhr ){
+              console.log( "Request received:", data );
+              var newLatLng = new L.LatLng(data.features[0].geometry.coordinates[1], data.features[0].geometry.coordinates[0]);
+              $("#dest").val(data.features[0].properties.label).autocomplete('close');
+              map.setView(newLatLng);
+              myMarker.setLatLng(newLatLng);
+              displayLatLng(newLatLng.lat, newLatLng.lng);
+              },
+              error: function( jqxhr, status, error ){
+                console.log( "Something went wrong!" );
+              }
+          });

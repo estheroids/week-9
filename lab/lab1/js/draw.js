@@ -70,11 +70,9 @@ Moving your mouse outside of the circle should remove the highlighting.
 ===================== */
 
 // Global Variables
-
-var myRectangle;
+var demoShapes = [];
 
 // Initialize Leaflet Draw
-
 var drawControl = new L.Control.Draw({
   draw: {
     polyline: false,
@@ -89,11 +87,39 @@ map.addControl(drawControl);
 
 // Run every time Leaflet draw creates a new layer
 
+/*$('button').on('click',function(){
+});*/
+
+//https://github.com/Leaflet/Leaflet.draw/issues/315
+
+//Limit to one rectangle/ remove the previous layer from the map.
+
 map.on('draw:created', function (e) {
     var type = e.layerType; // The type of shape
     var layer = e.layer; // The Leaflet layer for the shape
     var id = L.stamp(layer); // The unique Leaflet ID for the layer
+    //console.log(type, layer, id);
+    _.each(demoShapes, function(shape){
+    map.removeLayer(shape);             //remove prev
+  });
+    demoShapes.push(layer.addTo(map)); //push current
 
-
-
+// Task 4: Add shape to sidebar
+    var newDivID = "<div id="+id+"><h1>Current ID:"+id+"</h1></div>";
+    $("#shapes").empty();
+    $("#shapes").append(newDivID);
 });
+
+
+/*demoShapes.push();
+_.each(demoShapes, function(shape){
+  map.removeLayer(shape);
+
+  demoShape.addLayer(layer);
+  layer.addTo(map);
+
+  demoShapes.push(layer);
+  _.each(demoShapes, function(shape){
+  map.removeLayer(shape);
+});
+*/
